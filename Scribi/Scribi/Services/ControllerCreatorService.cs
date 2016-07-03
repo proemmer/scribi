@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Hosting;
+using System.Threading;
+using Scribi.Helper;
 
 namespace Scribi.Services
 {
@@ -26,6 +28,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Scribi.Interfaces;
 
 namespace Scribi.Controllers
 {{
@@ -34,9 +37,11 @@ namespace Scribi.Controllers
     {{
         private readonly {2} _obj;
 
-        public {0}Controller(IServiceCollection services)
+        public {0}Controller(IControllerCreatorService ccs)
         {{
-            _obj = services.BuildServiceProvider().GetRequiredService(typeof({2})) as {2};
+            //To get the selfe registred services, because asp.net 
+            //service provider did not update at runtime
+            _obj = ccs.ServiceProvider.GetRequiredService(typeof({2})) as {2};
         }}
 
 {1}
@@ -53,27 +58,50 @@ namespace Scribi.Controllers
         }}
         ";
 
+        private readonly ReaderWriterLockSlim _serviceLock = new ReaderWriterLockSlim();
         private readonly ILogger _logger;
         private readonly IRuntimeCompilerService _compiler;
         private readonly IServiceCollection _services;
+        private bool _servicesChanged = false;
         private readonly IControllerFactory _controllerFactory;
         private readonly ApplicationPartManager _apm;
+        private IServiceProvider _serviceProvider;
+
+
+        public IServiceProvider ServiceProvider
+        {
+            get
+            {
+                if (_serviceProvider == null || _servicesChanged)
+                {
+                    using (var guard = new UpgradeableGuard(_serviceLock))
+                    {
+                        if (_serviceProvider == null || _servicesChanged)
+                        {
+                            using (var writerGuard = guard.UpgradeToWriterLock())
+                            {
+                                _serviceProvider = _services.BuildServiceProvider();
+                                _servicesChanged = false;
+                            }
+                        }
+                    }
+                }
+                return _serviceProvider;
+            }
+        }
 
 
         public ControllerCreatorService(ILogger<ControllerCreatorService> logger,
                                         IRuntimeCompilerService compiler,
-                                        IServiceCollection services,
                                         IControllerFactory controllerFactory,
-                                        ApplicationPartManager apm)
+                                        ApplicationPartManager apm,
+                                        IServiceCollection services)
         {
             _logger = logger;
             _compiler = compiler;
             _services = services;
             _controllerFactory = controllerFactory;
             _apm = apm;
-            
-
-
         }
 
         #region IService Interface
@@ -131,8 +159,23 @@ namespace Scribi.Controllers
                     }
                     result.Add(string.Format(ControllerTemplate, attr.Name, sb.ToString(), type));
 
-                    //TODO add correct liceCycle
-                    _services.AddSingleton(type, type);
+                    switch(attr.LifecycleType)
+                    {
+                        case LifecycleType.Singleton:
+                            using (var guard = new WriterGuard(_serviceLock))
+                            {
+                                _services.AddSingleton(type, type);
+                                _servicesChanged = true;
+                            }
+                            break;
+                        case LifecycleType.Transient:
+                            using (var guard = new WriterGuard(_serviceLock))
+                            {
+                                _services.AddTransient(type, type);
+                                _servicesChanged = true;
+                            }
+                            break;
+                    }
                 }
             }
             return result;
