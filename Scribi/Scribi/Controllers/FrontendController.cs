@@ -3,17 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Scribi.Interfaces;
 
 namespace Scribi.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    public class FrontendController : Controller
     {
+        private readonly IScriptFactoryService _scriptFactory;
+
+        public FrontendController(IScriptFactoryService scriptFactory)
+        {
+            _scriptFactory = scriptFactory;
+        }
+
+
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            return _scriptFactory.GetScriptNames();
         }
 
         // GET api/values/5

@@ -58,7 +58,9 @@ namespace Scribi
             services.AddSingleton<IServiceCollection>(services);
             services.AddSingleton<IRuntimeCompilerService, RuntimeCompilerService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
-            services.AddSingleton<IControllerCreatorService, ControllerCreatorService>();
+            services.AddSingleton<IScriptCreatorService, ScriptCreatorService>();
+            services.AddSingleton<IScriptFactoryService, ScriptFactoryService>();
+            services.AddSingleton<ICyclicExecutorService, CyclicExecutorService>();
 
             //configure the auth
             services.AddScribiAuthentication(Configuration.GetSection("Auth")?.GetValue<string>("KeyFile"));
@@ -70,7 +72,8 @@ namespace Scribi
                                 ILoggerFactory loggerFactory,
                                 IRuntimeCompilerService runtimeCompilerService,
                                 IAuthenticationService authService,
-                                IControllerCreatorService controllerCreatorService)
+                                IScriptCreatorService controllerCreatorService,
+                                IScriptFactoryService scriptFactoryService)
         {
             var globalConfig = Configuration.GetSection("Global");
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
@@ -86,9 +89,12 @@ namespace Scribi
             runtimeCompilerService.Configure(Configuration.GetSection("RuntimeCompiler"));
             runtimeCompilerService.Init();
 
-            controllerCreatorService.Configure(Configuration.GetSection("ControllerCreator"));
+            controllerCreatorService.Configure(Configuration.GetSection("ScriptCreator"));
             controllerCreatorService.Init();
 
+
+            scriptFactoryService.Configure(Configuration.GetSection("ScriptFactory"));
+            scriptFactoryService.Init();
 
             app.UseScribiAuth();
 

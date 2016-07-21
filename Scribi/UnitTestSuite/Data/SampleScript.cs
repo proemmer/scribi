@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Scribi.Attributes;
+﻿using Scribi.Attributes;
 using Microsoft.Extensions.Logging;
 
 namespace UnitTestSuite
@@ -24,5 +20,25 @@ namespace UnitTestSuite
             _logger.LogInformation("GetData Called");
             return "Sample";
         }
+
+
+        [FunctionCall(FunctionCallType.CallOnStart)]
+        public void CallOnStart()
+        {
+            _logger.LogInformation("CallOnStart");
+        }
+
+        [FunctionCall(FunctionCallType.CallOnDelay,5000)]
+        public void CallDelay()
+        {
+            _logger.LogInformation("CallDelay");
+        }
+
+        [FunctionCall(FunctionCallType.CallOnInterval, 10000)]
+        public void CallOnInterval()
+        {
+            _logger.LogInformation("CallOnInterval");
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-﻿{
+{
   "dependencies": {
     "Microsoft.NETCore.App": {
       "version": "1.0.0",
@@ -18,11 +18,11 @@
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
     "Microsoft.Extensions.Configuration": "1.0.0",
     "Newtonsoft.Json": "9.0.1",
-    "NLog.Extensions.Logging": "1.0.0-rtm-alpha2",
     "Swashbuckle": "6.0.0-beta901",
     "Microsoft.Extensions.Configuration.Binder": "1.0.0",
     "Scribi.Attributes": "1.0.0-*",
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
+    "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
   },
 
   "tools": {

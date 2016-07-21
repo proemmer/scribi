@@ -8,17 +8,14 @@ using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.AspNetCore.Hosting;
 using System.Threading;
 using Scribi.Helper;
 
 namespace Scribi.Services
 {
-    public class ControllerCreatorService : IControllerCreatorService
+    public class ScriptCreatorService : IScriptCreatorService
     {
         private const string ControllerTemplate =
         @"
@@ -37,7 +34,7 @@ namespace Scribi.Controllers
     {{
         private readonly {2} _obj;
 
-        public {0}Controller(IControllerCreatorService ccs)
+        public {0}Controller(IScriptCreatorService ccs)
         {{
             //To get the selfe registred services, because asp.net 
             //service provider did not update at runtime
@@ -89,9 +86,9 @@ namespace Scribi.Controllers
                 return _serviceProvider;
             }
         }
+        public List<Type> Scripts { get; private set; } = new List<Type>();
 
-
-        public ControllerCreatorService(ILogger<ControllerCreatorService> logger,
+        public ScriptCreatorService(ILogger<ScriptCreatorService> logger,
                                         IRuntimeCompilerService compiler,
                                         IControllerFactory controllerFactory,
                                         ApplicationPartManager apm,
@@ -111,15 +108,7 @@ namespace Scribi.Controllers
 
         public void Init()
         {
-            var result = ExtractControllersFromTypes(_compiler.GetTypes());
-            if (result.Any())
-            {
-                var types = _compiler.CompileFiles(result, "Controllers");
-                _apm.ApplicationParts.Add(new AssemblyPart(types.Item1));
-                foreach (var type in types.Item2)
-                    _services.AddTransient(type, type);
-                
-            }
+            Bootstrap(_compiler.GetTypes());
         }
 
         public void Release()
@@ -128,38 +117,20 @@ namespace Scribi.Controllers
         }
         #endregion
 
-        public IEnumerable<string> ExtractControllersFromTypes(IEnumerable<Type> types)
+        public void Bootstrap(IEnumerable<Type> types)
         {
-            var result = new List<string>();
+            var generatedControllers = new List<string>();
             foreach (var type in types)
             {
                 var ti = type.GetTypeInfo();
                 var attr = ti.GetCustomAttribute<ScriptUnitAttribute>();
-                if (attr != null && attr.AccessType == AccessType.Rest)
+                if (attr != null)
                 {
-                    var sb = new StringBuilder();
-                    var methods = type.GetMethods();
-                    foreach (var method in methods)
-                    {
-                        var attributes = method.GetCustomAttributes<RestMethodAttribute>();
-                        if (attributes.Any())
-                        {
-                            foreach (var attribute in attributes)
-                            {
-                                var parameters = method.GetParameters();
-                                sb.Append(string.Format(ControllerMethod,
-                                                        HttpMethodToAttribute(attribute),
-                                                        method.ReturnType,
-                                                        method.Name,
-                                                        parameters.Any() ? ParametersToParameters(parameters) : string.Empty,
-                                                        parameters.Any() ? ParametersToCallParams(parameters) : string.Empty));
-                                sb.AppendLine();
-                            }
-                        }
-                    }
-                    result.Add(string.Format(ControllerTemplate, attr.Name, sb.ToString(), type));
+                    Scripts.Add(type);
+                    if (attr.AccessType == AccessType.Rest)
+                        generatedControllers.Add(CreateController(type, attr));
 
-                    switch(attr.LifecycleType)
+                    switch (attr.LifecycleType)
                     {
                         case LifecycleType.Singleton:
                             using (var guard = new WriterGuard(_serviceLock))
@@ -178,7 +149,39 @@ namespace Scribi.Controllers
                     }
                 }
             }
-            return result;
+
+            if (generatedControllers.Any())
+            {
+                var compiledType = _compiler.CompileFiles(generatedControllers, "Controllers");
+                _apm.ApplicationParts.Add(new AssemblyPart(compiledType.Item1));
+                foreach (var type in compiledType.Item2)
+                    _services.AddTransient(type, type);
+            }
+        }
+
+        private string CreateController(Type type, ScriptUnitAttribute attr)
+        {
+            var sb = new StringBuilder();
+            var methods = type.GetMethods();
+            foreach (var method in methods)
+            {
+                var attributes = method.GetCustomAttributes<RestMethodAttribute>();
+                if (attributes.Any())
+                {
+                    foreach (var attribute in attributes)
+                    {
+                        var parameters = method.GetParameters();
+                        sb.Append(string.Format(ControllerMethod,
+                                                HttpMethodToAttribute(attribute),
+                                                method.ReturnType,
+                                                method.Name,
+                                                parameters.Any() ? ParametersToParameters(parameters) : string.Empty,
+                                                parameters.Any() ? ParametersToCallParams(parameters) : string.Empty));
+                        sb.AppendLine();
+                    }
+                }
+            }
+            return string.Format(ControllerTemplate, attr.Name, sb.ToString(), type);
         }
 
         private string HttpMethodToAttribute(RestMethodAttribute attr)
