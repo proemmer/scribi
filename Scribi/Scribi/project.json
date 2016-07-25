@@ -1,28 +1,29 @@
 {
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "version": "1.0.0",
-      "type": "platform"
-    },
+    "Microsoft.AspNet.SignalR.Server": "3.0.0-beta5",
+    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0",
+    "Microsoft.AspNetCore.Diagnostics": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
+    "Microsoft.Extensions.Configuration": "1.0.0",
+    "Microsoft.Extensions.Configuration.Binder": "1.0.0",
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
     "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0",
     "Microsoft.Extensions.Configuration.Json": "1.0.0",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
     "Microsoft.Extensions.Logging": "1.0.0",
     "Microsoft.Extensions.Logging.Console": "1.0.0",
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
-    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0",
-    "Microsoft.AspNetCore.Diagnostics": "1.0.0",
-    "Microsoft.Extensions.Configuration": "1.0.0",
+    "Microsoft.NETCore.App": {
+      "version": "1.0.0",
+      "type": "platform"
+    },
     "Newtonsoft.Json": "9.0.1",
-    "Swashbuckle": "6.0.0-beta901",
-    "Microsoft.Extensions.Configuration.Binder": "1.0.0",
+    "NLog.Extensions.Logging": "1.0.0-rtm-alpha4",
     "Scribi.Attributes": "1.0.0-*",
-    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0",
-    "NLog.Extensions.Logging": "1.0.0-rtm-alpha4"
+    "Swashbuckle": "6.0.0-beta901"
   },
 
   "tools": {
@@ -33,7 +34,8 @@
     "netcoreapp1.0": {
       "imports": [
         "dotnet5.6",
-        "portable-net45+win8"
+        "portable-net45+win8",
+        "dnxcore50"
       ]
     }
   },

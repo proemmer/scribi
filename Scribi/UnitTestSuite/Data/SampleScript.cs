@@ -14,7 +14,7 @@ namespace UnitTestSuite
             _logger = logger;
         }
 
-        [RestMethod("GET")]
+        [ControllerMethod("GET")]
         public string GetData()
         {
             _logger.LogInformation("GetData Called");

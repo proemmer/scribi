@@ -11,8 +11,7 @@
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
     "Scribi": "1.0.0-*",
     "Scribi.Attributes": "1.0.0-*",
-    "Moq": "4.6.36-alpha"
-  },
+    "Moq": "4.6.36-alpha"  },
   "commands": {
     "test": "xunit.runner.dnx"
   },
@@ -20,7 +19,8 @@
     "netcoreapp1.0": {
       "imports": [
         "dotnet5.6",
-        "portable-net45+win8"
+        "portable-net45+win8",
+        "dnxcore50"
       ]
     }
   }
