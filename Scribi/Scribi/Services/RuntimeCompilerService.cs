@@ -49,6 +49,7 @@ namespace Scribi.Services
             //Add references
             DetermineReferences();
             CompileFilesFromLocation("Scripts");
+            LoadAssembliesFromLocation();
         }
 
         public void Release()
@@ -93,25 +94,61 @@ namespace Scribi.Services
             return CompileFiles(codes, assemblyName);
         }
 
+        public IEnumerable<Tuple<Assembly, IEnumerable<Type>>> LoadAssembliesFromLocation()
+        {
+            if (string.IsNullOrWhiteSpace(_location))
+                return new List<Tuple<Assembly, IEnumerable<Type>>>();
+
+            var result = new List<Tuple<Assembly, IEnumerable<Type>>>();
+            foreach (var item in Directory.GetFiles(_location, "*.dll"))
+            {
+                try
+                {
+                    var asm = _context.LoadFromAssemblyPath(item);
+                    if (asm != null)
+                    {
+                        var tuple = AddAssembly(asm);
+                        if (tuple != null)
+                        {
+                            result.Add(tuple);
+                            _references.Add(MetadataReference.CreateFromFile(item));
+                        }
+                    }
+                    else
+                        _logger.LogInformation($"Could not compile assembly!");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Exception while adding file {item} to runtime compiler. Exception was: {ex.Message}");
+                }
+            }
+            return result;
+        }
+
+
+
         public Tuple<Assembly,IEnumerable<Type>> CompileFiles(IEnumerable<string> files, string assemblyName)
         {
-            var result = new List<Type>();
             if (files.Any())
-            {
-                var asm = Compile(assemblyName, files);
-                if (asm != null)
-                {
-                    _resolvedAssemblies.Add(asm);
-                    result.AddRange(asm.GetExportedTypes());
-                    _resolvedTypes.AddRange(result);
-                    return new Tuple<Assembly, IEnumerable<Type>>(asm,result);
-                }
-                else
-                    _logger.LogInformation($"Could not compile mappings assembly!");
-            }
+                return AddAssembly(Compile(assemblyName, files));
             else
                 _logger.LogInformation($"No code to compile!");
-            return new Tuple<Assembly, IEnumerable<Type>>(null,result);
+            return null;
+        }
+
+        private Tuple<Assembly, IEnumerable<Type>> AddAssembly(Assembly asm)
+        {
+            if (asm != null)
+            {
+                var result = new List<Type>();
+                _resolvedAssemblies.Add(asm);
+                result.AddRange(asm.GetExportedTypes());
+                _resolvedTypes.AddRange(result);
+                return new Tuple<Assembly, IEnumerable<Type>>(asm, result);
+            }
+            else
+                _logger.LogInformation($"Could not compile assembly!");
+            return null;
         }
 
         private Assembly Compile(string name, IEnumerable<string> codes)
