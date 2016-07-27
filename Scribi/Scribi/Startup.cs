@@ -48,8 +48,6 @@ namespace Scribi
                 options.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
             });
 
-            //services.AddTransient<IControllerActivator, ServiceBasedControllerActivator>();
-
             //add filters
             services.AddScoped<ActionLoggerFilterAttribute>();
             services.AddScoped<ScribiExceptionFilterAttribute>();

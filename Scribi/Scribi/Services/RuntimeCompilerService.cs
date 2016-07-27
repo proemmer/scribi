@@ -21,6 +21,7 @@ namespace Scribi.Services
         private readonly ILogger _logger;
         private readonly List<MetadataReference> _references = new List<MetadataReference>();
         private readonly List<Type> _resolvedTypes = new List<Type>();
+        private readonly List<Assembly> _resolvedAssemblies = new List<Assembly>();
         private readonly AssemblyLoadContext _context;
         private readonly DependencyContext _depContext;
         private IEnumerable<string> _usings;
@@ -61,6 +62,11 @@ namespace Scribi.Services
             return _resolvedTypes.ToList();
         }
 
+        public IEnumerable<Assembly> GetAssemblies()
+        {
+            return _resolvedAssemblies.ToList();
+        }
+
         public Tuple<Assembly, IEnumerable<Type>> CompileFilesFromLocation(string assemblyName)
         {
             if (string.IsNullOrWhiteSpace(_location))
@@ -95,6 +101,7 @@ namespace Scribi.Services
                 var asm = Compile(assemblyName, files);
                 if (asm != null)
                 {
+                    _resolvedAssemblies.Add(asm);
                     result.AddRange(asm.GetExportedTypes());
                     _resolvedTypes.AddRange(result);
                     return new Tuple<Assembly, IEnumerable<Type>>(asm,result);

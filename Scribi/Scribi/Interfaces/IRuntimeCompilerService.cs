@@ -15,6 +15,8 @@ namespace Scribi.Interfaces
         /// <returns></returns>
         IEnumerable<Type> GetTypes();
 
+        IEnumerable<Assembly> GetAssemblies();
+
         Tuple<Assembly, IEnumerable<Type>> CompileFiles(IEnumerable<string> files, string assemblyName);
 
         Tuple<Assembly, IEnumerable<Type>> CompileFilesFromLocation(string assemblyName);

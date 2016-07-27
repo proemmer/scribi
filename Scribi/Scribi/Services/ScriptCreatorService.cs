@@ -71,7 +71,7 @@ namespace Scribi.Services
 
         public void Init()
         {
-            Bootstrap(_compiler.GetTypes());
+            Bootstrap(_compiler.GetAssemblies(), _compiler.GetTypes());
         }
 
         public void Release()
@@ -80,9 +80,9 @@ namespace Scribi.Services
         }
         #endregion
 
-        public void Bootstrap(IEnumerable<Type> types)
+        public void Bootstrap(IEnumerable<Assembly> assemblies, IEnumerable<Type> types)
         {
-            var generatedControllers = new List<string>();
+            var generatedServices = new List<string>();
             foreach (var type in types)
             {
                 var ti = type.GetTypeInfo();
@@ -90,11 +90,15 @@ namespace Scribi.Services
                 if (attr != null)
                 {
                     Scripts.Add(type);
-                    if (attr.AccessType == AccessType.Rest)
-                        generatedControllers.Add(ControllerCreator.Create(type, attr));
+                    if (attr.AccessType == AccessType.Rest || attr.AccessType == AccessType.Remote)
+                        generatedServices.Add(ControllerCreator.Create(type, attr));
 
-                    if (attr.AccessType == AccessType.SignalR)
-                        generatedControllers.Add(HubCreator.Create(type, attr));
+                    if (attr.AccessType == AccessType.SignalR || attr.AccessType == AccessType.Remote)
+                    {
+                        generatedServices.Add(HubCreator.Create(type, attr));
+                        if(attr.ClientInterface != null)
+                            _services.AddTransient(attr.ClientInterface, attr.ClientInterface);
+                    }
 
                     switch (attr.LifecycleType)
                     {
@@ -116,9 +120,10 @@ namespace Scribi.Services
                 }
             }
 
-            if (generatedControllers.Any())
+            if (generatedServices.Any())
             {
-                var compiledType = _compiler.CompileFiles(generatedControllers, "Controllers");
+                _services.AddSingleton(typeof(IClientWrapper<>), typeof(ClientWrapper<>));
+                var compiledType = _compiler.CompileFiles(generatedServices, "Remote");
                 _apm.ApplicationParts.Add(new AssemblyPart(compiledType.Item1));
                 foreach (var type in compiledType.Item2)
                     _services.AddTransient(type, type);

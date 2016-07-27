@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Scribi.CodeGeneration
 {
+    /// <summary>
+    /// TODO How to call Signal R  Client methods from user code!!!???
+    /// </summary>
     public static class HubCreator
     {
         #region Controller Creation
@@ -23,7 +26,7 @@ using Scribi.Interfaces;
 namespace Scribi.Hubs
 {{
     [HubName(""{0}"")]
-    public class {0}Hub : Hub
+    public class {0}Hub : Hub{3}
     {{
         private readonly {2} _obj;
 
@@ -70,7 +73,7 @@ namespace Scribi.Hubs
                     }
                 }
             }
-            return string.Format(HubTemplate, attr.Name, sb.ToString(), type);
+            return string.Format(HubTemplate, attr.Name, sb.ToString(), type, attr.ClientInterface != null ? $"<{attr.ClientInterface}>" : "");
         }
 
         private static string ParametersToParameters(ParameterInfo[] parameters)
