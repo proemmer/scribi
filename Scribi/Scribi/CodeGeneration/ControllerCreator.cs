@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Scribi.CodeGeneration
 {
-    public static class ControllerCreator
+    internal static class ControllerCreator
     {
         #region Controller Creation
         private const string ControllerTemplate =
@@ -16,11 +16,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Scribi.Interfaces;
+using Scribi.Filters;
+
 
 namespace Scribi.Controllers
 {{
+    [ServiceFilter(typeof(ActionLoggerFilterAttribute))]
+    [ServiceFilter(typeof(ScribiExceptionFilterAttribute))]
     [Route(""api/[controller]"")]
     public class {0}Controller : Controller
     {{
@@ -41,6 +46,7 @@ namespace Scribi.Controllers
         private const string ControllerMethod =
         @"
         {0}
+        {5}
         public {1} {2} ({3})
         {{
             return _obj.{2}({4});
@@ -66,7 +72,8 @@ namespace Scribi.Controllers
                                                 method.ReturnType,
                                                 method.Name,
                                                 parameters.Any() ? ParametersToParameters(parameters) : string.Empty,
-                                                parameters.Any() ? ParametersToCallParams(parameters) : string.Empty));
+                                                parameters.Any() ? ParametersToCallParams(parameters) : string.Empty,
+                                                string.IsNullOrWhiteSpace(attribute.Policy) ? "[AllowAnonymous]" : $"[Authorize(Policy = \"{attribute.Policy}\")]"));
                         sb.AppendLine();
                     }
                 }

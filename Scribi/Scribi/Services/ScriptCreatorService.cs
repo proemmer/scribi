@@ -91,13 +91,24 @@ namespace Scribi.Services
                 {
                     Scripts.Add(type);
                     if (attr.AccessType == AccessType.Rest || attr.AccessType == AccessType.Remote)
+                    {
                         generatedServices.Add(ControllerCreator.Create(type, attr));
+                        _logger.LogInformation($"WebApi Controller for type {type} was generated.");
+                    }
 
                     if (attr.AccessType == AccessType.SignalR || attr.AccessType == AccessType.Remote)
                     {
                         generatedServices.Add(HubCreator.Create(type, attr));
-                        if(attr.ClientInterface != null)
+                        _logger.LogInformation($"SignalR Hub for type {type} was generated.");
+                        if (attr.ClientInterface != null)
+                        {
+                            //IHubContext<WebpacHub, IWebpacClient>
+                            //ToDo create Proxy with context
                             _services.AddTransient(attr.ClientInterface, attr.ClientInterface);
+                            //var ifType = typeof(IClientWrapper<>).MakeGenericType(attr.ClientInterface);
+                            //var instanceType = typeof(ClientWrapper<>).MakeGenericType(attr.ClientInterface);
+                            //_services.AddTransient(ifType, ClientProxyCreator.Create());
+                        }
                     }
 
                     switch (attr.LifecycleType)
@@ -107,6 +118,7 @@ namespace Scribi.Services
                             {
                                 _services.AddSingleton(type, type);
                                 _servicesChanged = true;
+                                _logger.LogInformation($"Singleton service {type} was registred.");
                             }
                             break;
                         case LifecycleType.Transient:
@@ -114,6 +126,7 @@ namespace Scribi.Services
                             {
                                 _services.AddTransient(type, type);
                                 _servicesChanged = true;
+                                _logger.LogInformation($"Transient service {type} was registred.");
                             }
                             break;
                     }
@@ -126,7 +139,10 @@ namespace Scribi.Services
                 var compiledType = _compiler.CompileFiles(generatedServices, "Remote");
                 _apm.ApplicationParts.Add(new AssemblyPart(compiledType.Item1));
                 foreach (var type in compiledType.Item2)
+                {
                     _services.AddTransient(type, type);
+                    _logger.LogInformation($"Transient service {type} was registred.");
+                }
             }
         }
     }

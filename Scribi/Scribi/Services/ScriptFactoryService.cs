@@ -6,11 +6,13 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using Scribi.Attributes;
 using Scribi.Model;
+using Microsoft.Extensions.Logging;
 
 namespace Scribi.Services
 {
     public class ScriptFactoryService : IScriptFactoryService
     {
+        private ILogger<ScriptFactoryService> _logger;
         private IScriptCreatorService _scriptCreator;
         private ICyclicExecutorService _cycleExecutor;
         private List<FunctionCall> _functionCalls = new List<FunctionCall>();
@@ -41,10 +43,11 @@ namespace Scribi.Services
         }
 
 
-        public ScriptFactoryService(IScriptCreatorService scriptCreator, ICyclicExecutorService cycleExecutor)
+        public ScriptFactoryService(ILogger<ScriptFactoryService> logger, IScriptCreatorService scriptCreator, ICyclicExecutorService cycleExecutor)
         {
             _scriptCreator = scriptCreator;
             _cycleExecutor = cycleExecutor;
+            _logger = logger;
         }
 
         public void Configure(IConfigurationSection config)
@@ -132,7 +135,7 @@ namespace Scribi.Services
             }
             catch(Exception ex)
             {
-                //TODO
+                _logger.LogError($"Exception while invoking method {item.Method.Name} of script {item.ScriptType}. Error was: {ex.Message}");
             }
         }
     }

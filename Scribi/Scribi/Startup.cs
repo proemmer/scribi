@@ -10,7 +10,6 @@ using Scribi.Services;
 using Scribi.Auth;
 using Scribi.Interfaces;
 using NLog.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace Scribi
 {
@@ -89,7 +88,6 @@ namespace Scribi
 
             controllerCreatorService.Configure(Configuration.GetSection("ScriptCreator"));
             controllerCreatorService.Init();
-
 
             scriptFactoryService.Configure(Configuration.GetSection("ScriptFactory"));
             scriptFactoryService.Init();
