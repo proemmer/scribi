@@ -104,7 +104,7 @@ namespace Scribi.Services
                         {
                             //IHubContext<WebpacHub, IWebpacClient>
                             //ToDo create Proxy with context
-                            _services.AddTransient(attr.ClientInterface, attr.ClientInterface);
+                            //_services.AddTransient(attr.ClientInterface, attr.ClientInterface);
                             //var ifType = typeof(IClientWrapper<>).MakeGenericType(attr.ClientInterface);
                             //var instanceType = typeof(ClientWrapper<>).MakeGenericType(attr.ClientInterface);
                             //_services.AddTransient(ifType, ClientProxyCreator.Create());
@@ -135,7 +135,7 @@ namespace Scribi.Services
 
             if (generatedServices.Any())
             {
-                _services.AddSingleton(typeof(IClientWrapper<>), typeof(ClientWrapper<>));
+                //_services.AddSingleton(typeof(IClientWrapper<>), typeof(ClientWrapper<>));
                 var compiledType = _compiler.CompileFiles(generatedServices, "Remote");
                 _apm.ApplicationParts.Add(new AssemblyPart(compiledType.Item1));
                 foreach (var type in compiledType.Item2)

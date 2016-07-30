@@ -13,7 +13,8 @@ namespace UnitTestSuite
         bool CallClient(string test);
     }
 
-    [ScriptUnit("Sample",AccessType.Remote, typeof(UnitTestSuite.ISampleScriptClient))]
+    //[ScriptUnit("Sample",AccessType.Remote, typeof(UnitTestSuite.ISampleScriptClient))]
+    [ScriptUnit("Sample", AccessType.Rest)]
     public class SampleScript
     {
         private readonly ILogger _logger;
@@ -24,7 +25,7 @@ namespace UnitTestSuite
         public SampleScript(ILogger<SampleScript> logger, IScriptCreatorService ccs)
         {
             _logger = logger;
-            _client = ccs.ServiceProvider.GetRequiredService(typeof(IClientWrapper<ISampleScriptClient>)) as IClientWrapper<ISampleScriptClient>;
+            //_client = ccs.ServiceProvider.GetRequiredService(typeof(IClientWrapper<ISampleScriptClient>)) as IClientWrapper<ISampleScriptClient>;
         }
 
         [ControllerMethod("GET")]
