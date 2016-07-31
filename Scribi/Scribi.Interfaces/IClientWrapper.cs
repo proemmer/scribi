@@ -2,7 +2,7 @@
 
 namespace Scribi.Interfaces
 {
-    public interface IClientWrapper<TClient> where TClient : class
+    public interface IClientProxy<TClient> where TClient : class
     {
         TClient All { get; }
 

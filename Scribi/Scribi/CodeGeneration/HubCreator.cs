@@ -30,11 +30,11 @@ namespace Scribi.Hubs
     {{
         private readonly {2} _obj;
 
-        public {0}Hub(IScriptCreatorService ccs)
+        public {0}Hub({2} obj)
         {{
             //To get the selfe registred services, because asp.net 
             //service provider did not update at runtime
-            _obj = ccs.ServiceProvider.GetRequiredService(typeof({2})) as {2};
+            _obj = obj;
         }}
 
 {1}
@@ -52,7 +52,7 @@ namespace Scribi.Hubs
         #endregion
 
 
-        public static string Create(Type type, ScriptUnitAttribute attr)
+        public static Tuple<string,string> Create(Type type, ScriptUnitAttribute attr)
         {
             var sb = new StringBuilder();
             var methods = type.GetMethods();
@@ -73,7 +73,7 @@ namespace Scribi.Hubs
                     }
                 }
             }
-            return string.Format(HubTemplate, attr.Name, sb.ToString(), type, attr.ClientInterface != null ? $"<{attr.ClientInterface}>" : "");
+            return new Tuple<string,string>(attr.Name + "Hub", string.Format(HubTemplate, attr.Name, sb.ToString(), type, attr.ClientInterface != null ? $"<{attr.ClientInterface}>" : ""));
         }
 
         private static string ParametersToParameters(ParameterInfo[] parameters)

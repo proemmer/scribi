@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using System.Threading;
 using Scribi.Helper;
 using Scribi.CodeGeneration;
+using Microsoft.AspNetCore.SignalR.Hubs;
 
 namespace Scribi.Services
 {
@@ -23,9 +24,9 @@ namespace Scribi.Services
         private readonly IRuntimeCompilerService _compiler;
         private readonly IServiceCollection _services;
         private bool _servicesChanged = false;
-        private readonly IControllerFactory _controllerFactory;
         private readonly ApplicationPartManager _apm;
         private IServiceProvider _serviceProvider;
+        private readonly ScribiAssemblyLocator _locator;
 
 
         public IServiceProvider ServiceProvider
@@ -53,15 +54,15 @@ namespace Scribi.Services
 
         public ScriptCreatorService(ILogger<ScriptCreatorService> logger,
                                         IRuntimeCompilerService compiler,
-                                        IControllerFactory controllerFactory,
                                         ApplicationPartManager apm,
-                                        IServiceCollection services)
+                                        IServiceCollection services,
+                                        IAssemblyLocator assemblyLocator)
         {
             _logger = logger;
             _compiler = compiler;
             _services = services;
-            _controllerFactory = controllerFactory;
             _apm = apm;
+            _locator = assemblyLocator as ScribiAssemblyLocator;
         }
 
         #region IService Interface
@@ -83,6 +84,7 @@ namespace Scribi.Services
         public void Bootstrap(IEnumerable<Assembly> assemblies, IEnumerable<Type> types)
         {
             var generatedServices = new List<string>();
+            var clientProxiesToGenerate = new Dictionary<string,Type>();
             foreach (var type in types)
             {
                 var ti = type.GetTypeInfo();
@@ -98,16 +100,13 @@ namespace Scribi.Services
 
                     if (attr.AccessType == AccessType.SignalR || attr.AccessType == AccessType.Remote)
                     {
-                        generatedServices.Add(HubCreator.Create(type, attr));
+                        var result = HubCreator.Create(type, attr);
+                        generatedServices.Add(result.Item2);
                         _logger.LogInformation($"SignalR Hub for type {type} was generated.");
                         if (attr.ClientInterface != null)
                         {
-                            //IHubContext<WebpacHub, IWebpacClient>
-                            //ToDo create Proxy with context
-                            //_services.AddTransient(attr.ClientInterface, attr.ClientInterface);
-                            //var ifType = typeof(IClientWrapper<>).MakeGenericType(attr.ClientInterface);
-                            //var instanceType = typeof(ClientWrapper<>).MakeGenericType(attr.ClientInterface);
-                            //_services.AddTransient(ifType, ClientProxyCreator.Create());
+                            //var ifType = typeof(IClientProxy<>).MakeGenericType(attr.ClientInterface);
+                            clientProxiesToGenerate.Add(result.Item1, attr.ClientInterface);
                         }
                     }
 
@@ -133,14 +132,31 @@ namespace Scribi.Services
                 }
             }
 
+            var clientProxies = new List<string>();
             if (generatedServices.Any())
             {
-                //_services.AddSingleton(typeof(IClientWrapper<>), typeof(ClientWrapper<>));
                 var compiledType = _compiler.CompileFiles(generatedServices, "Remote");
+                _apm.ApplicationParts.Add(new AssemblyPart(compiledType.Item1));
+                _locator.AddAssemblyReference(compiledType.Item1);
+                foreach (var type in compiledType.Item2)
+                {
+                    Type t;
+                    if(clientProxiesToGenerate.TryGetValue(type.Name.Split('.').Last(),out t))
+                    {
+                        clientProxies.Add(ClientProxyCreator.Create(type,t));
+                    }
+                    _services.AddTransient(type, type);
+                    _logger.LogInformation($"Transient service {type} was registred.");
+                }
+            }
+
+            if(clientProxies.Any())
+            {
+                var compiledType = _compiler.CompileFiles(clientProxies, "Proxies");
                 _apm.ApplicationParts.Add(new AssemblyPart(compiledType.Item1));
                 foreach (var type in compiledType.Item2)
                 {
-                    _services.AddTransient(type, type);
+                    _services.AddTransient(type.GetInterfaces().FirstOrDefault(),type);
                     _logger.LogInformation($"Transient service {type} was registred.");
                 }
             }

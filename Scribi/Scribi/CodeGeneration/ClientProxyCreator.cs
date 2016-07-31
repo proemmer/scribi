@@ -27,27 +27,61 @@ namespace Scribi.CodeGeneration
 
         namespace Scribi.ProxyClient
         {{
-            public class {0}ProxyClient
+            public class {0}ClientProxy : IClientProxy<{1}>
             {{
-                private readonly {2} _obj;
+                private readonly IHubContext<{2},{1}> _obj;
 
-                public {0}ProxyClient(IScriptCreatorService ccs)
+                public {0}ClientProxy(IScriptCreatorService ccs)
                 {{
                     //To get the selfe registred services, because asp.net 
                     //service provider did not update at runtime
-                    _obj = ccs.ServiceProvider.GetRequiredService(typeof({2})) as {2};
+                    _obj = ccs.ServiceProvider.GetRequiredService(typeof(IHubContext<{2},{1}>)) as IHubContext<{2},{1}>;
                 }}
 
-        {1}
-            }}
-        }}
-        ";
 
-        private const string HubMethod =
-        @"
-        public {0} {1} ({2})
-        {{
-            return _obj.{1}({3});
+                public {1} All
+                {{
+                    get
+                    {{
+                        return _obj?.Clients.All;
+                    }}
+                }}
+
+                public {1} AllExcept(params string[] excludeConnectionIds)
+                {{
+                    return _obj?.Clients.AllExcept(excludeConnectionIds);
+                }}
+
+                public {1} Client(string connectionId)
+                {{
+                    return _obj?.Clients.Client(connectionId);
+                }}
+
+                public {1} Clients(IList<string> connectionIds)
+                {{
+                    return _obj?.Clients.Clients(connectionIds);
+                }}
+
+                public {1} Group(string groupName, params string[] excludeConnectionIds)
+                {{
+                    return _obj?.Clients.Group(groupName, excludeConnectionIds);
+                }}
+
+                public {1} Groups(IList<string> groupNames, params string[] excludeConnectionIds)
+                {{
+                    return _obj?.Clients.Groups(groupNames, excludeConnectionIds);
+                }}
+
+                public {1} User(string userId)
+                {{
+                    return _obj?.Clients.User(userId);
+                }}
+
+                public {1} Users(IList<string> userIds)
+                {{
+                    return _obj?.Clients.Users(userIds);
+                }}
+            }}
         }}
         ";
         #endregion
@@ -55,48 +89,7 @@ namespace Scribi.CodeGeneration
 
         public static string Create(Type tHub, Type tClient)
         {
-            var sb = new StringBuilder();
-            var methods = tClient.GetMethods();
-            foreach (var method in methods)
-            {
-                var parameters = method.GetParameters();
-                sb.Append(string.Format(HubMethod,
-                                        method.ReturnType,
-                                        method.Name,
-                                        parameters.Any() ? ParametersToParameters(parameters) : string.Empty,
-                                        parameters.Any() ? ParametersToCallParams(parameters) : string.Empty));
-                sb.AppendLine();
-            }
-
-            var ifType = typeof(IClientWrapper<>).MakeGenericType(tClient);
-            var instanceType = typeof(ClientWrapper<>).MakeGenericType(tClient);
-            return string.Format(HubTemplate, tHub.Name, sb.ToString(), ifType, ifType);
-        }
-
-        private static string ParametersToParameters(ParameterInfo[] parameters)
-        {
-            var sb = new StringBuilder();
-            foreach (var param in parameters)
-            {
-                if (sb.Length > 0)
-                    sb.Append(", ");
-                sb.Append(param.ParameterType);
-                sb.Append(" ");
-                sb.Append(param.Name);
-            }
-            return sb.ToString();
-        }
-
-        private static string ParametersToCallParams(ParameterInfo[] parameters)
-        {
-            var sb = new StringBuilder();
-            foreach (var param in parameters)
-            {
-                if (sb.Length > 0)
-                    sb.Append(", ");
-                sb.Append(param.Name);
-            }
-            return sb.ToString();
+            return string.Format(HubTemplate, tHub.Name, tClient, tHub);
         }
     }
 }

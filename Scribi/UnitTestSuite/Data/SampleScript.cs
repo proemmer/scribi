@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Scribi.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 
 namespace UnitTestSuite
 {
@@ -13,19 +15,27 @@ namespace UnitTestSuite
         bool CallClient(string test);
     }
 
-    //[ScriptUnit("Sample",AccessType.Remote, typeof(UnitTestSuite.ISampleScriptClient))]
-    [ScriptUnit("Sample", AccessType.Rest)]
+    [ScriptUnit("Sample",AccessType.Remote, typeof(UnitTestSuite.ISampleScriptClient))]
+    //[ScriptUnit("Sample", AccessType.Rest)]
     public class SampleScript
     {
         private readonly ILogger _logger;
-        private readonly IClientWrapper<ISampleScriptClient> _client;
+        private readonly IClientProxy<ISampleScriptClient> _client;
 
 
 
-        public SampleScript(ILogger<SampleScript> logger, IScriptCreatorService ccs)
+        public SampleScript(ILogger<SampleScript> logger, IClientProxy<ISampleScriptClient> client)
         {
             _logger = logger;
-            //_client = ccs.ServiceProvider.GetRequiredService(typeof(IClientWrapper<ISampleScriptClient>)) as IClientWrapper<ISampleScriptClient>;
+
+            try
+            {
+                _client = client;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
         }
 
         [ControllerMethod("GET")]
@@ -35,10 +45,10 @@ namespace UnitTestSuite
             return "Sample";
         }
 
-        public bool CallClient()
+        public void CallClient()
         {
             _logger.LogInformation("Call Client");
-            return _client.All.CallClient("TEST");
+            _client.All.CallClient("TEST");
         }
 
         [HubMethod(HubMethodType.Client)]
@@ -58,6 +68,15 @@ namespace UnitTestSuite
         public void CallDelay()
         {
             _logger.LogInformation("CallDelay");
+            try
+            {
+                CallClient();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            
         }
 
         [FunctionCall(FunctionCallType.CallOnInterval, 10000)]

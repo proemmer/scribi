@@ -31,11 +31,12 @@ namespace Scribi.Controllers
     {{
         private readonly {2} _obj;
 
-        public {0}Controller(IScriptCreatorService ccs)
+        public {0}Controller({2} obj)
         {{
             //To get the selfe registred services, because asp.net 
             //service provider did not update at runtime
-            _obj = ccs.ServiceProvider.GetRequiredService(typeof({2})) as {2};
+            //_obj = ccs.ServiceProvider.GetRequiredService(typeof({2})) as {2};
+            _obj = obj;
         }}
 
 {1}
