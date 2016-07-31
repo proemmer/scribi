@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyModel;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
 
-namespace Scribi.Services
+namespace Scribi.CodeGeneration
 {
     public class RuntimeCompilerService : IRuntimeCompilerService
     {

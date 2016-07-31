@@ -7,14 +7,12 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using System.Threading;
 using Scribi.Helper;
-using Scribi.CodeGeneration;
 using Microsoft.AspNetCore.SignalR.Hubs;
 
-namespace Scribi.Services
+namespace Scribi.CodeGeneration
 {
     public class ScriptCreatorService : IScriptCreatorService
     {

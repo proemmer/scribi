@@ -10,9 +10,7 @@ using Scribi.Services;
 using Scribi.Auth;
 using Scribi.Interfaces;
 using NLog.Extensions.Logging;
-using Microsoft.AspNetCore.SignalR.Hubs;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Scribi.Helper;
+using Scribi.CodeGeneration;
 
 namespace Scribi
 {
@@ -56,16 +54,14 @@ namespace Scribi
 
             //add the custom services
             services.AddSingleton<IServiceCollection>(services);
-            services.AddSingleton<IRuntimeCompilerService, RuntimeCompilerService>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
-            services.AddSingleton<IScriptCreatorService, ScriptCreatorService>();
             services.AddSingleton<IScriptFactoryService, ScriptFactoryService>();
             services.AddSingleton<ICyclicExecutorService, CyclicExecutorService>();
 
             //configure the auth
             services.AddScribiAuthentication(Configuration.GetSection("Auth")?.GetValue<string>("KeyFile"));
             
-            InitializeScriptCreation(services);
+            services.AddCodeGeneration(Configuration);
 
             //Latebinding
             //add signal r usage
@@ -73,8 +69,6 @@ namespace Scribi
             {
                 options.Hubs.EnableDetailedErrors = true;
             });
-
-            //services.Replace(new ServiceDescriptor(typeof(IAssemblyLocator), typeof(ScribiAssemblyLocator),ServiceLifetime.Singleton));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,7 +85,6 @@ namespace Scribi
             if (globalConfig.GetValue("UseLogFiles", true))
             {
                 loggerFactory.AddNLog();
-
                 env.ConfigureNLog("nlog.config");
             }
 
@@ -125,22 +118,6 @@ namespace Scribi
                 app.UseSwagger();
                 app.UseSwaggerUi();
             }
-        }
-
-        private void InitializeScriptCreation(IServiceCollection services)
-        {
-            services.AddSingleton<IAssemblyLocator, ScribiAssemblyLocator>();
-            var serviceProvider = services.BuildServiceProvider();
-            //services.Replace(new ServiceDescriptor(typeof(IAssemblyLocator), typeof(ScribiAssemblyLocator), ServiceLifetime.Singleton));
-            
-
-            var runtimeCompilerService = serviceProvider.GetService<IRuntimeCompilerService>();
-            runtimeCompilerService.Configure(Configuration.GetSection("RuntimeCompiler"));
-            runtimeCompilerService.Init();
-
-            var scriptCreatorService = serviceProvider.GetService<IScriptCreatorService>();
-            scriptCreatorService.Configure(Configuration.GetSection("ScriptCreator"));
-            scriptCreatorService.Init();
         }
     }
 }

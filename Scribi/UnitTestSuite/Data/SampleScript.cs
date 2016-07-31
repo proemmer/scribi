@@ -12,7 +12,7 @@ namespace UnitTestSuite
     //This is the interfaces for the client methods of the SignalRHub
     public interface ISampleScriptClient
     {
-        bool CallClient(string test);
+        void CallClient(string test);
     }
 
     [ScriptUnit("Sample",AccessType.Remote, typeof(UnitTestSuite.ISampleScriptClient))]
