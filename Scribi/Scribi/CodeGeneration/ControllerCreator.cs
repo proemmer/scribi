@@ -53,6 +53,16 @@ namespace Scribi.Controllers
             return _obj.{2}({4});
         }}
         ";
+
+        private const string VoidControllerMethod =
+@"
+        {0}
+        {5}
+        public void {2} ({3})
+        {{
+            _obj.{2}({4});
+        }}
+        ";
         #endregion
 
 
@@ -68,7 +78,7 @@ namespace Scribi.Controllers
                     foreach (var attribute in attributes)
                     {
                         var parameters = method.GetParameters();
-                        sb.Append(string.Format(ControllerMethod,
+                        sb.Append(string.Format(method.ReturnType == typeof(void) ? VoidControllerMethod : ControllerMethod,
                                                 HttpMethodToAttribute(attribute),
                                                 method.ReturnType,
                                                 method.Name,

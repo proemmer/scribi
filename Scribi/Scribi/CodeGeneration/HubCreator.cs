@@ -49,6 +49,14 @@ namespace Scribi.Hubs
             return _obj.{1}({3});
         }}
         ";
+
+        private const string VoidHubMethod =
+@"
+        public void {1} ({2})
+        {{
+            _obj.{1}({3});
+        }}
+        ";
         #endregion
 
 
@@ -64,7 +72,7 @@ namespace Scribi.Hubs
                     foreach (var attribute in attributes)
                     {
                         var parameters = method.GetParameters();
-                        sb.Append(string.Format(HubMethod,
+                        sb.Append(string.Format(method.ReturnType == typeof(void) ? VoidHubMethod : HubMethod,
                                                 method.ReturnType,
                                                 method.Name,
                                                 parameters.Any() ? ParametersToParameters(parameters) : string.Empty,

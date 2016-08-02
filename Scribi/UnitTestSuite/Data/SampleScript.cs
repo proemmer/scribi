@@ -52,7 +52,7 @@ namespace UnitTestSuite
         }
 
         [HubMethod(HubMethodType.Client)]
-        private void SignalClientCallServer()
+        public void SignalClientCallServer()
         {
             _logger.LogInformation("SignalR Client calls server");
         }
