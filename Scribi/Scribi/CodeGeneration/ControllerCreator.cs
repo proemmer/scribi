@@ -33,9 +33,6 @@ namespace Scribi.Controllers
 
         public {0}Controller({2} obj)
         {{
-            //To get the selfe registred services, because asp.net 
-            //service provider did not update at runtime
-            //_obj = ccs.ServiceProvider.GetRequiredService(typeof({2})) as {2};
             _obj = obj;
         }}
 

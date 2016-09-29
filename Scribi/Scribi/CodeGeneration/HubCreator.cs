@@ -32,8 +32,6 @@ namespace Scribi.Hubs
 
         public {0}Hub({2} obj)
         {{
-            //To get the selfe registred services, because asp.net 
-            //service provider did not update at runtime
             _obj = obj;
         }}
 
