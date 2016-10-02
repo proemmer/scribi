@@ -1,6 +1,6 @@
 # scribi
 (script binder)
-[![Windows CI](https://ci.appveyor.com/api/projects/status/github/proemmer/scribi?svg=true)](https://ci.appveyor.com/project/proemmer/scribi/branch/master)
+[![Windows CI](https://travis-ci.org/proemmer/scribi.svg?branch=master)](https://travis-ci.org/proemmer/scribi)
 
 By [Benjamin Proemmer](https://github.com/proemmer)
 
