@@ -1,6 +1,8 @@
 # scribi
 (script binder)
 
+[![Windows CI](https://travis-ci.org/proemmer/scribi.svg?branch=master)](https://travis-ci.org/proemmer/scribi)
+
 By [Benjamin Proemmer](https://github.com/proemmer)
 
 Scribi is the main application to run scripts and automatic generate an WebApi and SignalR interface for them.
