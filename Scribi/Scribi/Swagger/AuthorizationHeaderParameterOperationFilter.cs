@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Authorization;
 using System.Collections.Generic;
 using System.Linq;
-using Swashbuckle.SwaggerGen.Generator;
 using Swashbuckle.Swagger.Model;
+using Swashbuckle.SwaggerGen.Generator;
 
 namespace Scribi.Swagger
 {
