@@ -8,7 +8,7 @@ Scribi is the main application to run scripts and automatic generate an WebApi a
 
 #Deployment
 
-Based on the blog of [Scott Hansleman](http://www.hanselman.com/blog/SelfcontainedNETCoreApplications.aspx), you have two possibilities to deploy the app. 
+Based on the blog of [Scott Hanselman](http://www.hanselman.com/blog/SelfcontainedNETCoreApplications.aspx), you have two possibilities to deploy the app. 
 
 ## Framework-dependent (FDD)
 
