@@ -3,12 +3,3 @@ solution: scribi.sln
 mono: none
 dotnet: 1.0.0-preview2-003131
 
-matrix:
-  include:
-    - dotnet: 1.0.0-preview2-003131
-      mono: none
-      env: DOTNETCORE=1
-      
-script:
-  # Build sample
-  - dotnet test Scribi/UnitTestSuite
