@@ -1,5 +1,5 @@
 language: csharp
-solution: scribi/scribi.sln
+solution: ./Scribi/Scribi.sln
 
 matrix:
     include:
