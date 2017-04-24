@@ -1,0 +1,13 @@
+language: csharp
+solution: ./Scribi/Scribi.sln
+
+matrix:
+    include:
+        - os: linux
+          dist: trusty
+          sudo: required
+          dotnet: 1.0.0-preview2-003131 
+        - os: osx
+          osx_image: xcode7.2
+          dotnet: 1.0.0-preview2-003131 
+

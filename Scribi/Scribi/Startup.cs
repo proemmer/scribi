@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using Scribi.Swagger;
@@ -11,6 +10,7 @@ using Scribi.Auth;
 using Scribi.Interfaces;
 using NLog.Extensions.Logging;
 using Scribi.CodeGeneration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Scribi
 {

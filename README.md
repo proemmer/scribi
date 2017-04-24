@@ -1,6 +1,8 @@
 # scribi
 (script binder)
 
+[![Windows CI](https://travis-ci.org/proemmer/scribi.svg?branch=master)](https://travis-ci.org/proemmer/scribi)
+
 By [Benjamin Proemmer](https://github.com/proemmer)
 
 Scribi is the main application to run scripts and automatic generate an WebApi and SignalR interface for them.
@@ -8,7 +10,7 @@ Scribi is the main application to run scripts and automatic generate an WebApi a
 
 #Deployment
 
-Based on the blog of [Scott Hansleman](http://www.hanselman.com/blog/SelfcontainedNETCoreApplications.aspx), you have two possibilities to deploy the app. 
+Based on the blog of [Scott Hanselman](http://www.hanselman.com/blog/SelfcontainedNETCoreApplications.aspx), you have two possibilities to deploy the app. 
 
 ## Framework-dependent (FDD)
 
