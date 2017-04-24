@@ -1,24 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1D199B05-41BC-4346-A48F-D5850D9B2CCB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8B304104-C4F0-4F59-AFAE-D7CF833DAE49}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
-		global.json = global.json
 		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Scribi", "Scribi\Scribi.xproj", "{82A6DEE8-948A-4DF1-AB6B-CC294FECD851}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scribi", "Scribi\Scribi.csproj", "{82A6DEE8-948A-4DF1-AB6B-CC294FECD851}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Scribi.Attributes", "Scribi.Attributes\Scribi.Attributes.xproj", "{C3B04A84-D6F3-4CBA-8211-1F0D328CA12A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scribi.Attributes", "Scribi.Attributes\Scribi.Attributes.csproj", "{C3B04A84-D6F3-4CBA-8211-1F0D328CA12A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UnitTestSuite", "UnitTestSuite\UnitTestSuite.xproj", "{75A33D81-FC7C-40B9-8EEE-A0EAD0D448F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestSuite", "UnitTestSuite\UnitTestSuite.csproj", "{75A33D81-FC7C-40B9-8EEE-A0EAD0D448F8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Scribi.Interfaces", "Scribi.Interfaces\Scribi.Interfaces.xproj", "{526B4E81-FA67-4F8F-B90E-FAA8D6B51F3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scribi.Interfaces", "Scribi.Interfaces\Scribi.Interfaces.csproj", "{526B4E81-FA67-4F8F-B90E-FAA8D6B51F3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
